@@ -264,6 +264,7 @@ import type { VariantName } from '../lib/variants';
     statusEl.classList.toggle('game-over', isGameOver(state));
     renderMoves();
     variantSelect.value = state.variant;
+    $('board').classList.toggle('zones', state.variant === 'zone');
     document.querySelectorAll<HTMLElement>('.rules').forEach((el) => (el.hidden = el.dataset.variant !== state.variant));
     board.highlight(lastMove(state));
     save();

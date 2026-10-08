@@ -50,3 +50,102 @@ chess-board::part(board) {
   height: 3.5rem;
   padding: 0;
 }
+
+/* Chess Zone: 8 zones (4 files × 2 ranks), each with its own soft tint over the squares.
+   background-image sits under the box-shadow used for highlights, so both show. */
+
+/* a1–d2: sage */
+chess-board.zones::part(a1),
+chess-board.zones::part(b1),
+chess-board.zones::part(c1),
+chess-board.zones::part(d1),
+chess-board.zones::part(a2),
+chess-board.zones::part(b2),
+chess-board.zones::part(c2),
+chess-board.zones::part(d2) {
+  background-image: linear-gradient(rgba(126, 170, 120, 0.3), rgba(126, 170, 120, 0.3));
+}
+
+/* e1–h2: rose */
+chess-board.zones::part(e1),
+chess-board.zones::part(f1),
+chess-board.zones::part(g1),
+chess-board.zones::part(h1),
+chess-board.zones::part(e2),
+chess-board.zones::part(f2),
+chess-board.zones::part(g2),
+chess-board.zones::part(h2) {
+  background-image: linear-gradient(rgba(212, 132, 142, 0.3), rgba(212, 132, 142, 0.3));
+}
+
+/* a3–d4: sky */
+chess-board.zones::part(a3),
+chess-board.zones::part(b3),
+chess-board.zones::part(c3),
+chess-board.zones::part(d3),
+chess-board.zones::part(a4),
+chess-board.zones::part(b4),
+chess-board.zones::part(c4),
+chess-board.zones::part(d4) {
+  background-image: linear-gradient(rgba(112, 160, 212, 0.3), rgba(112, 160, 212, 0.3));
+}
+
+/* e3–h4: sand */
+chess-board.zones::part(e3),
+chess-board.zones::part(f3),
+chess-board.zones::part(g3),
+chess-board.zones::part(h3),
+chess-board.zones::part(e4),
+chess-board.zones::part(f4),
+chess-board.zones::part(g4),
+chess-board.zones::part(h4) {
+  background-image: linear-gradient(rgba(224, 190, 110, 0.32), rgba(224, 190, 110, 0.32));
+}
+
+/* a5–d6: lavender */
+chess-board.zones::part(a5),
+chess-board.zones::part(b5),
+chess-board.zones::part(c5),
+chess-board.zones::part(d5),
+chess-board.zones::part(a6),
+chess-board.zones::part(b6),
+chess-board.zones::part(c6),
+chess-board.zones::part(d6) {
+  background-image: linear-gradient(rgba(164, 142, 214, 0.3), rgba(164, 142, 214, 0.3));
+}
+
+/* e5–h6: peach */
+chess-board.zones::part(e5),
+chess-board.zones::part(f5),
+chess-board.zones::part(g5),
+chess-board.zones::part(h5),
+chess-board.zones::part(e6),
+chess-board.zones::part(f6),
+chess-board.zones::part(g6),
+chess-board.zones::part(h6) {
+  background-image: linear-gradient(rgba(232, 152, 104, 0.3), rgba(232, 152, 104, 0.3));
+}
+
+/* a7–d8: teal */
+chess-board.zones::part(a7),
+chess-board.zones::part(b7),
+chess-board.zones::part(c7),
+chess-board.zones::part(d7),
+chess-board.zones::part(a8),
+chess-board.zones::part(b8),
+chess-board.zones::part(c8),
+chess-board.zones::part(d8) {
+  background-image: linear-gradient(rgba(88, 178, 168, 0.3), rgba(88, 178, 168, 0.3));
+}
+
+/* e7–h8: mauve */
+chess-board.zones::part(e7),
+chess-board.zones::part(f7),
+chess-board.zones::part(g7),
+chess-board.zones::part(h7),
+chess-board.zones::part(e8),
+chess-board.zones::part(f8),
+chess-board.zones::part(g8),
+chess-board.zones::part(h8) {
+  background-image: linear-gradient(rgba(186, 120, 170, 0.3), rgba(186, 120, 170, 0.3));
+}

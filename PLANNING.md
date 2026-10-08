@@ -54,6 +54,11 @@ Drag-and-drop moves with legality checks, turn enforcement, promotion picker, la
 - A player who can capture the enemy king must do so (e.g. after a failed escape from check). If that capture ends with the king still in check, or taken, its owner loses.
 - Checkmate still ends the game.
 
+**Chess Zone** (`ChessZone` extends `ChessRisk`, overriding only `riskPieces`):
+- The board is split into 8 zones of 4 files × 2 ranks, each tinted a soft pastel (`chess-board.zones` rules in `board.css`).
+- Attackers: the attacking piece (from anywhere) plus all of A's pieces in the captured piece's zone, legal capture or not. Defenders: all of B's pieces in that zone.
+- Everything else, including kings counting and the forced king capture, works as in Chess Risk.
+
 **Technical notes:**
 - `GameState.turns` stores the FEN after every turn. Undo and saving use it, because Chess Risk rewrites the board with `load()`, which wipes chess.js's history. Side effect: threefold repetition only counts positions since the last undo or page reload.
 - Testing: add Vitest for `game.ts` and variant logic.
