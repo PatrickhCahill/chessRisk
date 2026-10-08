@@ -4,19 +4,19 @@
   width: min(90vw, 220px);
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: var(--space-m);
 }
 
 .dice-box {
   background: var(--panel);
-  border: 1px solid var(--accent);
+  border: 1px solid var(--accent-soft);
   border-radius: var(--radius);
-  padding: 1rem;
+  padding: var(--space-m);
   text-align: center;
 }
 
 .dice-area {
-  margin: 0.75rem 0;
+  margin: var(--space-m) 0;
   border-radius: var(--radius);
   background: radial-gradient(circle at 50% 40%, var(--felt), var(--felt-edge));
   box-shadow: inset 0 2px 8px var(--felt-shadow);
@@ -55,11 +55,11 @@
 .risk-box {
   display: flex;
   flex-direction: column;
-  gap: 0.6rem;
+  gap: var(--space-s);
 }
 
 .risk-box h3 {
-  font-family: Inter, system-ui, -apple-system, sans-serif;
+  font-family: system-ui, -apple-system, sans-serif;
   font-weight: 100;
   font-size: 1.1rem;
   margin: 0;
@@ -69,11 +69,11 @@
 .risk-row {
   display: flex;
   align-items: center;
-  gap: 0.4rem;
+  gap: var(--space-s);
   background: var(--inset);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 0.5rem 0.75rem;
+  padding: var(--space-s) var(--space-m);
 }
 
 .risk-row span {

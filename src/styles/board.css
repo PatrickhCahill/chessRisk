@@ -4,7 +4,7 @@
   width: min(90vw, 600px);
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: var(--space-l);
 }
 
 chess-board {
@@ -14,9 +14,9 @@ chess-board {
 }
 
 /* Rounded corners; overflow clips the corner squares to match.
-   chessboard-element's default dark border is removed. */
+   Replaces chessboard-element's default dark border. */
 chess-board::part(board) {
-  border: 1px solid var(--accent);
+  border: 1px solid var(--accent-soft);
   border-radius: var(--radius);
   overflow: hidden;
 }
@@ -24,9 +24,9 @@ chess-board::part(board) {
 #promotion-dialog {
   background: var(--panel);
   color: var(--text);
-  border: 1px solid var(--accent);
+  border: 1px solid var(--accent-soft);
   border-radius: var(--radius);
-  padding: 1rem 1.25rem;
+  padding: var(--space-m);
 }
 
 #promotion-dialog::backdrop {
@@ -34,13 +34,13 @@ chess-board::part(board) {
 }
 
 #promotion-dialog p {
-  margin: 0 0 0.75rem;
+  margin: 0 0 var(--space-s);
   text-align: center;
 }
 
 .choices {
   display: flex;
-  gap: 0.5rem;
+  gap: var(--space-s);
 }
 
 .choices button {

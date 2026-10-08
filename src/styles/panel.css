@@ -1,14 +1,14 @@
-/* Side panel: variant and sound settings, status, move list, buttons. */
+/* Side panel: settings, buttons, status, move list. */
 
 .panel {
   width: min(90vw, 260px);
   background: var(--panel);
-  border: 1px solid var(--accent);
+  border: 1px solid var(--accent-soft);
   border-radius: var(--radius);
-  padding: 1rem;
+  padding: var(--space-m);
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: var(--space-m);
 }
 
 .panel label {
@@ -22,11 +22,11 @@
 .settings {
   display: flex;
   flex-direction: column;
-  gap: 0.6rem;
+  gap: var(--space-s);
 }
 
 .panel-title {
-  font-family: Inter, system-ui, -apple-system, sans-serif;
+  font-family: system-ui, -apple-system, sans-serif;
   font-weight: 100;
   font-size: 1.1rem;
   margin: 0;
@@ -36,7 +36,7 @@
 .setting-name {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: var(--space-s);
 }
 
 .setting-name svg {
@@ -91,32 +91,30 @@
 }
 
 .status {
-  font-family: Inter, system-ui, -apple-system, sans-serif;
+  font-family: system-ui, -apple-system, sans-serif;
   font-weight: 100;
   font-size: 1.1rem;
   margin: 0;
   color: var(--accent);
 }
 
-
-
-
-.status.game-over {
-  color: var(--accent);
-}
-
+/* Fixed height, so the panel doesn't grow as moves are added. */
 .moves {
+  height: 14rem;
   margin: 0;
   padding-left: 2.25rem;
-  max-height: 360px;
-  min-height: 6rem;
   overflow-y: auto;
   font-variant-numeric: tabular-nums;
-  color: var(--muted);
+  color: var(--muted); /* move numbers */
 }
 
 .moves li {
-  padding: 0.1rem 0;
+  padding: 0.15rem 0.4rem;
+  border-radius: 4px;
+}
+
+.moves li:nth-child(even) {
+  background: var(--inset);
 }
 
 .moves span {
@@ -129,7 +127,7 @@
 .controls {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: var(--space-s);
 }
 
 .controls button {
