@@ -44,7 +44,7 @@ function piecesTaking(moves: Move[], x: Square): Square[] {
 const other = (color: Color): Color => (color === 'w' ? 'b' : 'w');
 
 export class ChessRisk extends Chess {
-  // Captures are settled by dice; see chess_risk.md.
+  // Captures are settled by dice; see readme.md.
 
   /** The enemy king's square, if the side to move can capture it (it must, see moves()). */
   kingToTake(): Square | null {

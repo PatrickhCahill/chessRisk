@@ -10,13 +10,10 @@ import ChessGame from '../components/ChessGame.astro';
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Chess Risk</title>
     <script is:inline>
-      // Set the theme before the page paints: the saved choice, else the device setting.
-      let theme = null;
-      try {
-        theme = localStorage.getItem('chess-risk:theme');
-      } catch {}
-      document.documentElement.dataset.theme =
-        theme || (matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+      // Set the theme from the device setting before the page paints.
+      document.documentElement.dataset.theme = matchMedia('(prefers-color-scheme: light)').matches
+        ? 'light'
+        : 'dark';
     </script>
   </head>
   <body>
@@ -27,6 +24,7 @@ import ChessGame from '../components/ChessGame.astro';
     <main>
       <ChessGame />
     </main>
+    <footer><p>A website which lets you play variants of chess inspired by the board game risk. Made for my best friend.</p></footer>
   </body>
 </html>
 

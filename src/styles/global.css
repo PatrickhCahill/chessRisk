@@ -103,3 +103,14 @@ header p {
   align-items: flex-start;
   padding: var(--space-l) var(--space-m);
 }
+
+
+footer {
+  text-align: center;
+  padding: var(--space-l) var(--space-m) 0;
+}
+
+footer p {
+  margin: 0.25rem 0 0;
+  color: var(--muted);
+}
