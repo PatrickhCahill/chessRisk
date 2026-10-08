@@ -1,0 +1,27 @@
+/* Rules card under the board. */
+
+.rules {
+  background: var(--panel);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius);
+  padding: 1rem 1.25rem;
+  line-height: 1.5;
+}
+
+.rules h2 {
+  margin-bottom: 0.5rem;
+}
+
+.rules p {
+  margin: 0;
+}
+
+.rules ul {
+  margin: 0.75rem 0 0;
+  padding-left: 1.25rem;
+  color: var(--muted);
+}
+
+.rules li + li {
+  margin-top: 0.4rem;
+}

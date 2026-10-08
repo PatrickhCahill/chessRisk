@@ -1,0 +1,321 @@
+---
+import '../styles/board.css';
+import '../styles/dice.css';
+import '../styles/panel.css';
+import '../styles/rules.css';
+import { VARIANTS } from '../lib/variants';
+
+const promotions = [
+  { value: 'q', label: 'Queen', glyph: '♛' },
+  { value: 'r', label: 'Rook', glyph: '♜' },
+  { value: 'b', label: 'Bishop', glyph: '♝' },
+  { value: 'n', label: 'Knight', glyph: '♞' },
+];
+---
+
+<div class="game">
+  <section class="dice-column">
+    <div class="dice-box">
+      <h2>Dice</h2>
+      <div class="dice-area">
+        <div id="attacker-dice" class="dice-row"></div>
+        <div id="defender-dice" class="dice-row"></div>
+      </div>
+      <p id="dice-result" class="dice-result"></p>
+    </div>
+    <div class="dice-box risk-box">
+      <h3>How much do you risk?</h3>
+      <div id="attacker-risk" class="risk-row">
+        <span>Attacker</span>
+        {[1, 2, 3].map((n) => <button type="button" value={n} disabled>{n}</button>)}
+      </div>
+      <div id="defender-risk" class="risk-row">
+        <span>Defender</span>
+        {[1, 2].map((n) => <button type="button" value={n} disabled>{n}</button>)}
+      </div>
+    </div>
+  </section>
+
+  <div class="board-column">
+    <chess-board id="board" draggable-pieces></chess-board>
+
+    {
+      Object.entries(VARIANTS).map(([name, v]) => (
+        <section class="rules" data-variant={name} hidden>
+          <h2>Rules: {v.label}</h2>
+          <p>{v.intro}</p>
+          {v.rules.length > 0 && <ul>{v.rules.map((rule) => <li>{rule}</li>)}</ul>}
+        </section>
+      ))
+    }
+  </div>
+
+  <aside class="panel">
+    <div class="settings">
+      <h3 class="panel-title">Settings</h3>
+      <label>
+        Variant
+        <select id="variant">
+          {Object.entries(VARIANTS).map(([name, v]) => <option value={name}>{v.label}</option>)}
+        </select>
+      </label>
+      <label>
+        <span class="setting-name">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M11 5 6 9H3v6h3l5 4z" />
+            <path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13" />
+          </svg>
+        </span>
+        <input id="sound" class="switch" type="checkbox" role="switch" checked />
+      </label>
+      <label>
+        <span class="setting-name">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z" />
+          </svg>
+        </span>
+        <input id="dark-mode" class="switch" type="checkbox" role="switch" />
+      </label>
+    </div>
+    <div class="controls">
+      <button id="undo" type="button">Undo</button>
+      <button id="flip" type="button">Flip board</button>
+      <button id="new-game" type="button">New game</button>
+    </div>
+    <p id="status" class="status" aria-live="polite"></p>
+    <ol id="moves" class="moves"></ol>
+  </aside>
+</div>
+
+<!-- The clicked button's value becomes dialog.returnValue. -->
+<dialog id="promotion-dialog">
+  <form method="dialog">
+    <p>Promote to</p>
+    <div class="choices">
+      {promotions.map((c) => <button value={c.value} aria-label={c.label}>{c.glyph}</button>)}
+    </div>
+  </form>
+</dialog>
+
+<script>
+  import type { Square } from 'chess.js';
+import type { ChessBoardElement } from 'chessboard-element';
+import { createBoard } from '../lib/board';
+import { chooseRisk, diceSettings, rollDice, showDiceText } from '../lib/dice';
+import {
+canPickUp,
+createGame,
+isGameOver,
+lastMove,
+needsPromotion,
+riskPieces,
+settleCapture,
+statusText,
+tryMove,
+undo,
+type PromotionPiece,
+} from '../lib/game';
+import type { VariantName } from '../lib/variants';
+
+  const STORAGE_KEY = 'chess-risk:game';
+  const SOUND_KEY = 'chess-risk:sound';
+  const THEME_KEY = 'chess-risk:theme'; // also read by the <head> script in index.astro
+
+  const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
+  const statusEl = $('status');
+  const movesEl = $<HTMLOListElement>('moves');
+  const variantSelect = $<HTMLSelectElement>('variant');
+  const promotionDialog = $<HTMLDialogElement>('promotion-dialog');
+  const soundToggle = $<HTMLInputElement>('sound');
+  const darkModeToggle = $<HTMLInputElement>('dark-mode');
+
+  function loadSaved() {
+    try {
+      const { variant, turns } = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? '{}');
+      return createGame(variant, turns);
+    } catch {
+      return createGame();
+    }
+  }
+
+  function save() {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ variant: state.variant, turns: state.turns }));
+    } catch {
+      // Storage unavailable: the game just won't survive a refresh.
+    }
+  }
+
+  let state = loadSaved();
+  let busy = false; // true while players choose promotion or risk dice
+  let onSquareClick: ((square: Square) => void) | null = null; // set while picking pieces to lose
+
+  const board = createBoard($<ChessBoardElement>('board'), {
+    canPickUp: (piece) => !busy && canPickUp(state, piece),
+    onMove(from, to) {
+      const [f, t] = [from as Square, to as Square];
+      if (needsPromotion(state, f, t) || riskPieces(state, f, t)) {
+        void slowMove(f, t);
+        return false; // snap back while the players choose
+      }
+      if (!tryMove(state, { from: f, to: t })) return false;
+      render();
+      return true;
+    },
+    onSettled: () => board.setPosition(state.chess.fen(), false),
+    onClick: (square) => onSquareClick?.(square as Square),
+  });
+
+  function choosePromotion(): Promise<PromotionPiece | null> {
+    return new Promise((resolve) => {
+      promotionDialog.returnValue = '';
+      promotionDialog.addEventListener(
+        'close',
+        () => resolve((promotionDialog.returnValue as PromotionPiece) || null),
+        { once: true },
+      );
+      promotionDialog.showModal();
+    });
+  }
+
+  /** Let a player click `count` of the given squares. Resolves with the squares clicked. */
+  function pickPieces(name: string, squares: Square[], count: number): Promise<Square[]> {
+    const picked: Square[] = [];
+    const remaining = () => squares.filter((s) => !picked.includes(s));
+    const prompt = () => {
+      const left = count - picked.length;
+      showDiceText(`${name}: click ${left} piece${left > 1 ? 's' : ''} to lose`);
+      board.mark(remaining());
+    };
+    if (count === 0) return Promise.resolve(picked);
+    prompt();
+    return new Promise((resolve) => {
+      onSquareClick = (square) => {
+        if (!remaining().includes(square)) return;
+        picked.push(square);
+        if (picked.length < count) return prompt();
+        onSquareClick = null;
+        board.mark([]);
+        resolve(picked);
+      };
+    });
+  }
+
+  /**
+   * Chess Risk capture (see chess_risk.md): defender and attacker choose their dice,
+   * roll, then each side clicks the pieces it loses.
+   */
+  async function riskCapture({ x, attackers, defenders }: { x: Square; attackers: Square[]; defenders: Square[] }) {
+    const attacker = state.chess.turn();
+    const [attackerName, defenderName] = attacker === 'w' ? ['White', 'Black'] : ['Black', 'White'];
+    const defenderDice = await chooseRisk('defender', Math.min(defenders.length, 2), `${defenderName}: how many defenders?`);
+    const attackerDice = await chooseRisk('attacker', Math.min(attackers.length, 3), `${attackerName}: how many attackers?`);
+    const dice = await rollDice(attackerDice, defenderDice, attacker);
+
+    // Compare highest with highest, and so on. Ties go to the defender.
+    const pairs = Math.min(attackerDice, defenderDice);
+    let defenderLosses = 0;
+    for (let i = 0; i < pairs; i++) if (dice.attacker[i] > dice.defender[i]) defenderLosses++;
+    const attackerLosses = pairs - defenderLosses;
+    const won = attackerLosses === 0;
+
+    // If the attacker won every pair, the piece on x is one of the defender's losses.
+    const lost = won ? [x] : [];
+    lost.push(...(await pickPieces(defenderName, defenders.filter((s) => s !== x || !won), defenderLosses - lost.length)));
+    lost.push(...(await pickPieces(attackerName, attackers, attackerLosses)));
+    showDiceText(won ? `${attackerName} captures` : `${attackerName}'s capture fails`);
+    return { won, lost };
+  }
+
+  /** A move that needs the players' input first: a promotion choice and/or a risk roll. */
+  async function slowMove(from: Square, to: Square) {
+    busy = true;
+    try {
+      const promotion = needsPromotion(state, from, to) ? await choosePromotion() : undefined;
+      if (promotion === null) return; // promotion cancelled
+      const pieces = riskPieces(state, from, to);
+      if (pieces) {
+        const { won, lost } = await riskCapture(pieces);
+        settleCapture(state, { from, to, promotion }, won, lost);
+      } else if (!tryMove(state, { from, to, promotion })) return;
+      board.setPosition(state.chess.fen());
+      render();
+    } finally {
+      busy = false;
+    }
+  }
+
+  function renderMoves() {
+    movesEl.replaceChildren();
+    for (let i = 0; i < state.turns.length; i += 2) {
+      const li = document.createElement('li');
+      for (const turn of state.turns.slice(i, i + 2)) {
+        const span = document.createElement('span');
+        span.textContent = turn.san;
+        li.append(span);
+      }
+      movesEl.append(li);
+    }
+    movesEl.scrollTop = movesEl.scrollHeight;
+  }
+
+  function render() {
+    statusEl.textContent = statusText(state);
+    statusEl.classList.toggle('game-over', isGameOver(state));
+    renderMoves();
+    variantSelect.value = state.variant;
+    document.querySelectorAll<HTMLElement>('.rules').forEach((el) => (el.hidden = el.dataset.variant !== state.variant));
+    board.highlight(lastMove(state));
+    save();
+  }
+
+  /** Start a fresh game, asking first if one is in progress. Returns false if cancelled. */
+  function newGame(variant: VariantName): boolean {
+    if (busy) return false;
+    if (state.turns.length && !isGameOver(state) && !confirm('Abandon the current game?')) return false;
+    state = createGame(variant);
+    board.setPosition(state.chess.fen());
+    render();
+    return true;
+  }
+
+  variantSelect.addEventListener('change', () => {
+    if (!newGame(variantSelect.value as VariantName)) variantSelect.value = state.variant;
+  });
+
+  $('new-game').addEventListener('click', () => newGame(state.variant));
+
+  $('undo').addEventListener('click', () => {
+    if (busy) return;
+    undo(state);
+    board.setPosition(state.chess.fen());
+    render();
+  });
+
+  try {
+    soundToggle.checked = localStorage.getItem(SOUND_KEY) !== 'off';
+  } catch {}
+  diceSettings.sound = soundToggle.checked;
+  soundToggle.addEventListener('change', () => {
+    diceSettings.sound = soundToggle.checked;
+    try {
+      localStorage.setItem(SOUND_KEY, soundToggle.checked ? 'on' : 'off');
+    } catch {}
+  });
+
+  // The theme itself is set by the <head> script; this just reflects and changes it.
+  darkModeToggle.checked = document.documentElement.dataset.theme === 'dark';
+  darkModeToggle.addEventListener('change', () => {
+    const theme = darkModeToggle.checked ? 'dark' : 'light';
+    document.documentElement.dataset.theme = theme;
+    try {
+      localStorage.setItem(THEME_KEY, theme);
+    } catch {}
+  });
+
+  $('flip').addEventListener('click', () => board.flip());
+
+  board.setPosition(state.chess.fen(), false);
+  render();
+</script>
+

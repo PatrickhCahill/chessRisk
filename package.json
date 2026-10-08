@@ -1,0 +1,25 @@
+{
+  "name": "chess-risk",
+  "type": "module",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "check": "astro check",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "@fontsource/inter": "^5.3.0",
+    "astro": "^7.3.5",
+    "chess.js": "^1.4.0",
+    "chessboard-element": "^1.2.0",
+    "computer-modern": "^0.1.3",
+    "roll-a-die": "^2.0.1"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.10",
+    "typescript": "^6.0.3"
+  }
+}

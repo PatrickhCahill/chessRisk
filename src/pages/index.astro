@@ -1,0 +1,32 @@
+---
+import '../styles/global.css';
+import ChessGame from '../components/ChessGame.astro';
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Chess Risk</title>
+    <script is:inline>
+      // Set the theme before the page paints: the saved choice, else the device setting.
+      let theme = null;
+      try {
+        theme = localStorage.getItem('chess-risk:theme');
+      } catch {}
+      document.documentElement.dataset.theme =
+        theme || (matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+    </script>
+  </head>
+  <body>
+    <header>
+      <h1>Chess Ideas</h1>
+      <p>A small gift.</p>
+    </header>
+    <main>
+      <ChessGame />
+    </main>
+  </body>
+</html>
+

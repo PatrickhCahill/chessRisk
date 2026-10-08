@@ -1,0 +1,109 @@
+/* Theme, base elements and page layout. */
+@import "computer-modern/index.css";
+
+/* Dark theme (default). The <head> script sets data-theme before the page paints. */
+:root {
+  --bg: #1f1d1a;
+  --panel: #2b2824;
+  --border: #4a453e;
+  --inset: #34302a; /* boxes inside a panel */
+  --text: #ece6dc;
+  --muted: #a39a8c;
+  --accent: #d9a441;
+  --felt: #3a352f; /* dice box background */
+  --felt-edge: #24211d;
+  --felt-shadow: rgba(0, 0, 0, 0.6);
+  --divider: rgba(255, 255, 255, 0.08);
+  --light-square: #f0d9b5;
+  --dark-square: #b58863;
+  --last-move: rgba(217, 164, 65, 0.45);
+  --pick: rgba(214, 69, 65, 0.55);
+  --radius: 8px;
+  color-scheme: dark;
+  font-family: "CMU Serif"
+  /* font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; */
+}
+
+:root[data-theme='light'] {
+  --bg: #f4efe6;
+  --panel: #fffaf2;
+  --border: #d8cfc0;
+  --inset: #f3ece0;
+  --text: #2b2824;
+  --muted: #6f6658;
+  --accent: #a87414;
+  --felt: #ece4d6;
+  --felt-edge: #d6cbb8;
+  --felt-shadow: rgba(0, 0, 0, 0.2);
+  --divider: rgba(0, 0, 0, 0.1);
+  color-scheme: light;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--text);
+}
+
+button {
+  font: inherit;
+  color: var(--text);
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.5rem 0.9rem;
+  cursor: pointer;
+}
+
+button:hover {
+  border-color: var(--accent);
+}
+
+/* Card titles (dice box, rules). */
+h2 {
+  font-family: Inter, system-ui, -apple-system, sans-serif;
+  font-weight: 100;
+  /* font-size: 2em; */
+  margin: 0;
+  color: var(--accent);
+}
+
+header {
+  text-align: center;
+  padding: 1.5rem 1rem 0;
+}
+
+h1 {
+  font-family: system-ui, -apple-system, sans-serif;
+  font-weight: 100;
+  font-size: 4em;
+  margin: 0;
+  color: var(--accent);
+}
+
+/* h1 {
+  margin: 0;
+  color: var(--accent);
+  letter-spacing: 0.02em;
+  font-family: Arial, Helvetica, sans-serif;
+} */
+
+header p {
+  margin: 0.25rem 0 0;
+  color: var(--muted);
+}
+
+/* Dice column, board column and side panel, side by side. */
+.game {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 1.5rem 1rem;
+}

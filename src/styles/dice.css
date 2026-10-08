@@ -1,0 +1,104 @@
+/* Dice box (roll-a-die animation) and the risk buttons under it. */
+
+.dice-column {
+  width: min(90vw, 220px);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.dice-box {
+  background: var(--panel);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius);
+  padding: 1rem;
+  text-align: center;
+}
+
+.dice-area {
+  margin: 0.75rem 0;
+  border-radius: var(--radius);
+  background: radial-gradient(circle at 50% 40%, var(--felt), var(--felt-edge));
+  box-shadow: inset 0 2px 8px var(--felt-shadow);
+  overflow: hidden;
+}
+
+.dice-row {
+  height: 130px;
+  padding: 1rem 0 0 1.5rem;
+  text-align: left;
+}
+
+/* Subtle divider between attacker (top) and defender (bottom) dice. */
+.dice-row + .dice-row {
+  border-top: 1px solid var(--divider);
+}
+
+/* Dice colour follows the chess side. roll-a-die's faces are white by default,
+   and its CSS loads later, so these selectors must be more specific than its
+   `.dice-outer .dice .dice-face`. */
+.dice-row[data-color='b'] .dice .dice-face {
+  background: #2a2622;
+  border-color: #111;
+}
+
+.dice-row[data-color='b'] .dice .dice-face circle {
+  fill: #ece6dc;
+}
+
+.dice-result {
+  margin: 0;
+  font-weight: 600;
+  min-height: 1.5em;
+}
+
+.risk-box {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.risk-box h3 {
+  font-family: Inter, system-ui, -apple-system, sans-serif;
+  font-weight: 100;
+  font-size: 1.1rem;
+  margin: 0;
+  color: var(--accent);
+}
+
+.risk-row {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: var(--inset);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.5rem 0.75rem;
+}
+
+.risk-row span {
+  flex: 1;
+  text-align: left;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.risk-row.active {
+  border-color: var(--accent);
+}
+
+.risk-row.active span {
+  color: var(--text);
+}
+
+.risk-row button {
+  width: 2rem;
+  padding: 0.3rem 0;
+  font-size: 0.85rem;
+}
+
+.risk-row button:disabled {
+  opacity: 0.35;
+  cursor: default;
+  border-color: var(--border);
+}
