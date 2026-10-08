@@ -51,14 +51,12 @@ const promotions = [
   </div>
 
   <aside class="panel">
+    <div id="variants" class="variants">
+      <h3 class="panel-title">Variant</h3>
+      {Object.entries(VARIANTS).map(([name, v]) => <button type="button" value={name}>{v.label}</button>)}
+    </div>
     <div class="settings">
       <h3 class="panel-title">Settings</h3>
-      <label>
-        Variant
-        <select id="variant">
-          {Object.entries(VARIANTS).map(([name, v]) => <option value={name}>{v.label}</option>)}
-        </select>
-      </label>
       <label>
         <span class="setting-name">
           <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -124,7 +122,7 @@ import type { VariantName } from '../lib/variants';
   const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
   const statusEl = $('status');
   const movesEl = $<HTMLOListElement>('moves');
-  const variantSelect = $<HTMLSelectElement>('variant');
+  const variantButtons = [...$('variants').querySelectorAll('button')];
   const promotionDialog = $<HTMLDialogElement>('promotion-dialog');
   const soundToggle = $<HTMLInputElement>('sound');
   const darkModeToggle = $<HTMLInputElement>('dark-mode');
@@ -263,7 +261,7 @@ import type { VariantName } from '../lib/variants';
     statusEl.textContent = statusText(state);
     statusEl.classList.toggle('game-over', isGameOver(state));
     renderMoves();
-    variantSelect.value = state.variant;
+    variantButtons.forEach((b) => b.setAttribute('aria-pressed', String(b.value === state.variant)));
     $('board').classList.toggle('zones', state.variant === 'zone');
     document.querySelectorAll<HTMLElement>('.rules').forEach((el) => (el.hidden = el.dataset.variant !== state.variant));
     board.highlight(lastMove(state));
@@ -280,9 +278,7 @@ import type { VariantName } from '../lib/variants';
     return true;
   }
 
-  variantSelect.addEventListener('change', () => {
-    if (!newGame(variantSelect.value as VariantName)) variantSelect.value = state.variant;
-  });
+  variantButtons.forEach((b) => b.addEventListener('click', () => newGame(b.value as VariantName)));
 
   $('new-game').addEventListener('click', () => newGame(state.variant));
 
