@@ -11,7 +11,7 @@ export interface BoardHandlers {
   onMove(from: string, to: string): boolean;
   /** Called after a drop animation finishes, so the board can be resynced. */
   onSettled(): void;
-  /** Called when a square is clicked (without dragging). */
+  /** Called when a square is clicked or tapped (without dragging). */
   onClick(square: string): void;
 }
 
@@ -40,10 +40,19 @@ export function createBoard(el: ChessBoardElement, handlers: BoardHandlers): Boa
   // Castling, en passant and promotion change more than the dragged piece.
   el.addEventListener('snap-end', () => handlers.onSettled());
 
+  // Taps and clicks on squares. Pointer events rather than 'click': the board
+  // calls preventDefault() on touchstart over a piece, which stops iOS from
+  // ever sending a click. A tap is a press and release on the same square.
   // Squares carry a data-square attribute inside the board's shadow DOM.
-  el.addEventListener('click', (e) => {
-    const square = e.composedPath().find((n) => n instanceof HTMLElement && n.dataset.square);
-    if (square) handlers.onClick((square as HTMLElement).dataset.square!);
+  const squareOf = (e: Event) =>
+    (e.composedPath().find((n) => n instanceof HTMLElement && n.dataset.square) as HTMLElement | undefined)?.dataset
+      .square;
+  let pressed: string | undefined;
+  el.addEventListener('pointerdown', (e) => (pressed = squareOf(e)));
+  el.addEventListener('pointerup', (e) => {
+    const square = squareOf(e);
+    if (square && square === pressed) handlers.onClick(square);
+    pressed = undefined;
   });
 
   // Squares expose a shadow part named after themselves (e.g. ::part(e4)),
